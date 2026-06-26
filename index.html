@@ -435,5 +435,30 @@ function showLens(lens) {
 }
 </script>
 
+<script>
+// Prevent number labels overlapping in all Plotly charts
+(function () {
+  var divs = document.querySelectorAll('.plotly-graph-div');
+  divs.forEach(function (div) {
+    if (!div._fullLayout) return;
+    // uniformtext hides labels that can't fit without overlapping
+    Plotly.relayout(div, {
+      'uniformtext.mode': 'hide',
+      'uniformtext.minsize': 9
+    });
+    // For bar charts: switch outside labels to auto so Plotly
+    // moves them inside (or hides them) rather than letting them overlap
+    var data = div.data || [];
+    var updates = {};
+    data.forEach(function (trace, i) {
+      if ((trace.type === 'bar' || !trace.type) && trace.textposition === 'outside') {
+        updates['textposition[' + i + ']'] = 'auto';
+      }
+    });
+    if (Object.keys(updates).length) Plotly.restyle(div, updates);
+  });
+})();
+</script>
+
 </body>
 </html>
